@@ -981,7 +981,7 @@ async function handleChoice(action, btn) {
     turnCount++;
 
     const userMsg = `I chose: ${action.tag} — ${action.desc}. Turn ${turnCount}. ${turnCount >= 8 ? 'This is the final turn. After Mia responds, generate the [ASSESSMENT].' : 'Continue the session.'}`;
-    await callClaude(userMsg);
+    await call(userMsg);
   }, 900);
 }
 
