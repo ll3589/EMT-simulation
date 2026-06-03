@@ -621,7 +621,7 @@
           <span>"Set up a scenario where time delay is most relevant."</span>
         </div>
       </button>
-      <button class="starter-btn" onclick="startSim('reflect')">
+      <button class="starter-btn" onclick="showReflect()">
         <span class="starter-icon">📝</span>
         <div class="starter-text">
           <strong>Reflect on a Past Session</strong>
@@ -749,6 +749,22 @@
   </div>
 </div>
 
+<!-- ══ SCREEN: REFLECT ══ -->
+<div class="screen" id="screen-reflect">
+  <div style="max-width:600px;margin:0 auto;padding:2rem;">
+    <button class="back-btn" onclick="showScreen('screen-landing')" style="margin-bottom:1.5rem;">← Back</button>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;margin-bottom:.5rem;">Reflect on a Past Session</h2>
+    <p style="color:var(--soft);font-size:14px;margin-bottom:1.5rem;">Describe what happened in your session — what you tried, how Mia responded, what felt hard. Claude will give you personalized EMT feedback.</p>
+    <textarea id="reflect-input" placeholder="e.g. I kept asking Mia questions but she stopped responding. I tried time delay once but wasn't sure if I did it right…" style="width:100%;height:180px;padding:14px;border-radius:var(--radius);border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;background:var(--warm-white);color:var(--charcoal);line-height:1.6;"></textarea>
+    <button class="begin-btn" onclick="submitReflect()" style="margin-top:12px;">Get Feedback →</button>
+    <div id="reflect-output" style="margin-top:1.5rem;display:none;">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--sage);margin-bottom:10px;">EMT Reflection Feedback</div>
+      <div id="reflect-content" style="font-size:14px;line-height:1.7;color:var(--charcoal);background:var(--warm-white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;"></div>
+      <button class="begin-btn" onclick="showScreen('screen-landing')" style="margin-top:12px;background:var(--mid);">← Back to home</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SYSTEM_PROMPT = `You are "Mia," a 4-year-old child with a language delay practicing Enhanced Milieu Teaching (EMT) with a student teacher in SPED 7800.
 
@@ -862,34 +878,45 @@ async function call(userMessage, isFirst = false) {
     conversationHistory.push({ role: 'user', content: userMessage });
   }
 
-  try {
-    const response = await fetch('https://emt-proxy.ll3589.workers.dev', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 3000,
-        system: SYSTEM_PROMPT,
-        messages: conversationHistory
-      })
-    });
+  let attempts = 0;
+  while (attempts < 3) {
+    try {
+      const response = await fetch('https://emt-proxy.ll3589.workers.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 3000,
+          system: SYSTEM_PROMPT,
+          messages: conversationHistory
+        })
+      });
 
-    const data = await response.json();
-    const text = data.content?.map(b => b.text || '').join('') || '';
-    conversationHistory.push({ role: 'assistant', content: text });
+      const data = await response.json();
+      if (data.type === 'error') throw new Error(data.error?.message || 'API error');
+      const text = data.content?.map(b => b.text || '').join('') || '';
+      if (!text) throw new Error('Empty response');
+      conversationHistory.push({ role: 'assistant', content: text });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (text.includes('[ASSESSMENT]')) {
-      const assessText = text.split('[ASSESSMENT]')[1].trim();
-      renderAssessment(assessText);
-    } else {
-      renderMiaResponse(text);
+      if (text.includes('[ASSESSMENT]')) {
+        const assessText = text.split('[ASSESSMENT]')[1].trim();
+        renderAssessment(assessText);
+      } else {
+        renderMiaResponse(text);
+      }
+      return;
+    } catch (err) {
+      attempts++;
+      if (attempts >= 3) {
+        setLoading(false);
+        appendSystemMsg('Something went wrong after 3 attempts. Please try again.');
+        enableActions();
+      } else {
+        await new Promise(r => setTimeout(r, 1500));
+      }
     }
-  } catch (err) {
-    setLoading(false);
-    appendSystemMsg('Something went wrong. Please try again.');
-    enableActions();
   }
 }
 
@@ -1031,8 +1058,67 @@ function openExitModal() { document.getElementById('exit-modal').classList.add('
 function closeExitModal() { document.getElementById('exit-modal').classList.remove('active'); }
 function confirmExit() {
   closeExitModal();
-  conversationHistory = [];
-  showScreen('screen-landing');
+  if (turnCount > 0) {
+    generateEarlyReport();
+  } else {
+    conversationHistory = [];
+    showScreen('screen-landing');
+  }
+}
+
+async function generateEarlyReport() {
+  showScreen('screen-assessment');
+  document.getElementById('assess-content').textContent = 'Generating your assessment…';
+  const summary = `The session ended early after ${turnCount} turn(s). Based on the choices made so far, generate a partial EMT assessment with: strengths observed, areas to work on, and one encouraging closing note. Keep it brief since the session was incomplete.`;
+  try {
+    const response = await fetch('https://emt-proxy.ll3589.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        system: SYSTEM_PROMPT,
+        messages: [...conversationHistory, { role: 'user', content: summary }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.map(b => b.text || '').join('') || '';
+    conversationHistory = [];
+    renderAssessment(text);
+  } catch(e) {
+    conversationHistory = [];
+    showScreen('screen-landing');
+  }
+}
+
+function showReflect() {
+  document.getElementById('reflect-input').value = '';
+  document.getElementById('reflect-output').style.display = 'none';
+  showScreen('screen-reflect');
+}
+
+async function submitReflect() {
+  const input = document.getElementById('reflect-input').value.trim();
+  if (!input) return;
+  document.getElementById('reflect-output').style.display = 'block';
+  document.getElementById('reflect-content').textContent = 'Analyzing your session…';
+  try {
+    const response = await fetch('https://emt-proxy.ll3589.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        system: `You are an expert EMT (Enhanced Milieu Teaching) coach for SPED 7800. A student teacher is reflecting on a session they did with a child. Give warm, specific, evidence-based feedback. Structure your response with: 1) What they did well (specific EMT strategies), 2) What to try differently (concrete suggestions), 3) One key focus for next time. Keep it encouraging and practical.`,
+        messages: [{ role: 'user', content: input }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.map(b => b.text || '').join('') || '';
+    document.getElementById('reflect-content').innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  } catch(e) {
+    document.getElementById('reflect-content').textContent = 'Something went wrong. Please try again.';
+  }
 }
 </script>
 </body>
