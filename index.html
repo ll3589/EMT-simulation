@@ -841,7 +841,7 @@ async function startSim(mode) {
     firstMessage = 'I want to reflect on EMT strategies as we go. Begin Scene 1 and after each of my choices, briefly note (in one sentence after Mia responds) what strategy I used and whether it was effective, before giving me the next choices.';
   }
 
-  await callClaude(firstMessage, true);
+  await call(firstMessage, true);
 }
 
 function updateSceneUI() {
@@ -854,7 +854,7 @@ function updateSceneUI() {
   }
 }
 
-async function callClaude(userMessage, isFirst = false) {
+async function call(userMessage, isFirst = false) {
   setLoading(true, isFirst ? 'Mia is getting ready…' : 'Mia is thinking…');
   disableActions();
 
@@ -867,7 +867,7 @@ async function callClaude(userMessage, isFirst = false) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         system: SYSTEM_PROMPT,
         messages: conversationHistory
