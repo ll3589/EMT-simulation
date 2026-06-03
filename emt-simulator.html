@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mia — EMT Practice Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F3EE;
+    --warm-white: #FDFAF7;
+    --charcoal: #1C1C1C;
+    --mid: #5A5550;
+    --soft: #9B9189;
+    --border: #E2DDD8;
+    --sage: #7B9E87;
+    --sage-light: #EEF4F0;
+    --amber: #C4832A;
+    --amber-light: #FDF3E3;
+    --blush: #D4837A;
+    --blush-light: #FCEEED;
+    --sky: #6A9CB8;
+    --sky-light: #EEF4F8;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ── LANDING ── */
+  #screen-landing {
+    background: var(--warm-white);
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .landing-inner { max-width: 520px; }
+
+  .avatar-ring {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--sage-light);
+    border: 3px solid var(--sage);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .landing-inner h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    color: var(--charcoal);
+    line-height: 1.2;
+    margin-bottom: .5rem;
+  }
+
+  .landing-inner .sub {
+    font-size: 14px;
+    color: var(--soft);
+    margin-bottom: 2rem;
+    font-weight: 400;
+  }
+
+  .tag-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .tag {
+    font-size: 12px; font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--cream);
+    color: var(--mid);
+    border: 1px solid var(--border);
+  }
+
+  .starters-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--soft);
+    margin-bottom: 1rem;
+  }
+
+  .starters { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+
+  .starter-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .15s;
+    text-align: left;
+    width: 100%;
+  }
+
+  .starter-btn:hover {
+    border-color: var(--sage);
+    background: var(--sage-light);
+    transform: translateY(-1px);
+  }
+
+  .starter-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .starter-text strong {
+    display: block;
+    font-size: 14px; font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 2px;
+  }
+
+  .starter-text span {
+    font-size: 13px;
+    color: var(--mid);
+    font-style: italic;
+  }
+
+  /* ── ONBOARDING ── */
+  #screen-onboarding {
+    background: var(--warm-white);
+    padding: 2rem;
+    align-items: center;
+  }
+
+  .onboard-inner { max-width: 640px; width: 100%; }
+
+  .onboard-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .onboard-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+  }
+
+  .back-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: 999px; padding: 6px 14px;
+    font-size: 13px; color: var(--mid); cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .15s;
+  }
+  .back-btn:hover { background: var(--cream); }
+
+  .onboard-section {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+
+  .onboard-section h3 {
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .07em;
+    color: var(--sage);
+    margin-bottom: 10px;
+  }
+
+  .onboard-section p, .onboard-section li {
+    font-size: 14px; color: var(--mid); line-height: 1.65;
+  }
+
+  .onboard-section ul { padding-left: 18px; }
+  .onboard-section ul li { margin-bottom: 5px; }
+
+  .strategy-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 10px;
+  }
+
+  .strategy-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+
+  .strategy-card .s-name {
+    font-size: 12px; font-weight: 600;
+    color: var(--charcoal); margin-bottom: 4px;
+  }
+
+  .strategy-card .s-desc {
+    font-size: 12px; color: var(--soft); line-height: 1.5;
+  }
+
+  .begin-btn {
+    width: 100%; padding: 15px;
+    background: var(--sage);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    border: none; border-radius: var(--radius);
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background .2s, transform .15s;
+  }
+  .begin-btn:hover { background: #6a8f75; transform: translateY(-1px); }
+
+  /* ── SIMULATION ── */
+  #screen-sim {
+    background: var(--cream);
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .sim-topbar {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .sim-child-info {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .child-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--sage-light);
+    border: 2px solid var(--sage);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .child-name {
+    font-weight: 600; font-size: 14px; color: var(--charcoal);
+  }
+
+  .child-desc { font-size: 12px; color: var(--soft); }
+
+  .scene-indicator {
+    font-size: 12px; color: var(--mid);
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+
+  .exit-btn {
+    background: none;
+    border: 1px solid var(--blush);
+    color: var(--blush);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .15s;
+  }
+  .exit-btn:hover { background: var(--blush-light); }
+
+  .scene-progress {
+    display: flex; gap: 6px;
+    padding: 10px 20px;
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .scene-dot {
+    flex: 1; height: 3px; border-radius: 2px;
+    background: var(--border);
+    transition: background .4s;
+  }
+  .scene-dot.active { background: var(--sage); }
+  .scene-dot.done { background: var(--amber); }
+
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* messages */
+  .msg-wrap { display: flex; flex-direction: column; gap: 4px; max-width: 82%; }
+  .msg-wrap.child { align-self: flex-start; }
+  .msg-wrap.teacher { align-self: flex-end; }
+
+  .msg-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--soft);
+    padding: 0 4px;
+  }
+  .msg-wrap.teacher .msg-label { text-align: right; }
+
+  .bubble {
+    padding: 11px 15px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .msg-wrap.child .bubble {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    color: var(--charcoal);
+  }
+
+  .msg-wrap.teacher .bubble {
+    background: var(--sky);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .env-cue {
+    font-size: 13px; font-style: italic;
+    color: var(--mid);
+    background: var(--amber-light);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 8px 12px;
+    margin-bottom: 2px;
+  }
+
+  .typing-bubble {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+    padding: 12px 16px;
+    display: flex; gap: 5px; align-items: center;
+  }
+
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--soft);
+    animation: bounce 1.1s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: .18s; }
+  .dot:nth-child(3) { animation-delay: .36s; }
+
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  /* action area */
+  .action-area {
+    background: var(--warm-white);
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+    flex-shrink: 0;
+  }
+
+  .action-prompt {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .07em;
+    color: var(--soft);
+    margin-bottom: 10px;
+  }
+
+  .action-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+
+  .action-btn {
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color .15s, background .15s, transform .1s;
+  }
+
+  .action-btn:hover:not(:disabled) {
+    border-color: var(--sage);
+    background: var(--sage-light);
+    transform: translateY(-1px);
+  }
+
+  .action-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .action-tag {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: var(--soft);
+    display: block; margin-bottom: 3px;
+  }
+
+  .action-tag.missed { color: var(--blush); }
+  .action-tag.strong { color: var(--sage); }
+
+  .action-text {
+    font-size: 13px; color: var(--charcoal); line-height: 1.4;
+  }
+
+  .end-session-wrap {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .end-session-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-size: 13px; color: var(--mid);
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: background .15s;
+  }
+  .end-session-btn:hover { background: var(--cream); }
+
+  /* loading state */
+  .loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(247,243,238,.85);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+  }
+  .loading-overlay.active { display: flex; }
+  .loading-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--sage);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 13px; color: var(--mid); }
+
+  /* ── ASSESSMENT ── */
+  #screen-assessment {
+    background: var(--warm-white);
+    padding: 2rem;
+    align-items: center;
+    overflow-y: auto;
+  }
+
+  .assess-inner { max-width: 640px; width: 100%; }
+
+  .assess-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .assess-header .badge {
+    display: inline-block;
+    background: var(--sage-light);
+    color: var(--sage);
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .07em;
+    padding: 4px 14px; border-radius: 999px;
+    margin-bottom: 12px;
+  }
+
+  .assess-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+  }
+
+  .assess-header p {
+    font-size: 13px; color: var(--soft);
+  }
+
+  .assess-content {
+    font-size: 14px;
+    color: var(--charcoal);
+    line-height: 1.75;
+    white-space: pre-wrap;
+  }
+
+  .assess-content h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--charcoal);
+    margin: 1.5rem 0 .5rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .assess-actions {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .assess-btn {
+    flex: 1; min-width: 180px;
+    padding: 13px 20px;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    transition: transform .15s, background .15s;
+    border: 1.5px solid var(--border);
+  }
+
+  .assess-btn:hover { transform: translateY(-1px); }
+  .assess-btn.primary { background: var(--sage); color: white; border-color: var(--sage); }
+  .assess-btn.secondary { background: var(--cream); color: var(--charcoal); }
+
+  /* ── EXIT CONFIRM ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(28,28,28,.45);
+    z-index: 200;
+    align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.active { display: flex; }
+
+  .modal-box {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    padding: 28px 28px 22px;
+    max-width: 380px; width: 100%;
+    text-align: center;
+  }
+
+  .modal-box h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem; margin-bottom: 8px;
+  }
+
+  .modal-box p { font-size: 14px; color: var(--mid); margin-bottom: 20px; }
+
+  .modal-btns { display: flex; gap: 10px; }
+
+  .modal-btn {
+    flex: 1; padding: 11px;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    transition: background .15s;
+  }
+
+  .modal-btn.cancel { background: var(--cream); border: 1px solid var(--border); color: var(--charcoal); }
+  .modal-btn.confirm { background: var(--blush); border: none; color: white; }
+
+  @media (max-width: 520px) {
+    .strategy-grid { grid-template-columns: 1fr; }
+    .action-grid { grid-template-columns: 1fr; }
+    .landing-inner h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">Mia is getting ready…</div>
+</div>
+
+<!-- EXIT MODAL -->
+<div class="modal-overlay" id="exit-modal">
+  <div class="modal-box">
+    <h3>Exit simulation?</h3>
+    <p>Your current session progress won't be saved. You can start a new session anytime.</p>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeExitModal()">Keep going</button>
+      <button class="modal-btn confirm" onclick="confirmExit()">Exit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: LANDING ══ -->
+<div class="screen active" id="screen-landing">
+  <div class="landing-inner">
+    <div class="avatar-ring">🧒</div>
+    <h1>Practice EMT<br>with Mia</h1>
+    <p class="sub">SPED 7800 · Enhanced Milieu Teaching Simulator</p>
+    <div class="tag-row">
+      <span class="tag">Age 4</span>
+      <span class="tag">Language delay</span>
+      <span class="tag">1–2 word utterances</span>
+      <span class="tag">High interest: blocks & trains</span>
+    </div>
+    <div class="starters-label">Choose how to begin</div>
+    <div class="starters">
+      <button class="starter-btn" onclick="startSim('begin')">
+        <span class="starter-icon">🧒</span>
+        <div class="starter-text">
+          <strong>Meet Mia — Start a Session</strong>
+          <span>"I'm ready to practice. Let's begin a session with Mia."</span>
+        </div>
+      </button>
+      <button class="starter-btn" onclick="startSim('strategy')">
+        <span class="starter-icon">🔄</span>
+        <div class="starter-text">
+          <strong>Try a Specific Strategy</strong>
+          <span>"Set up a scenario where time delay is most relevant."</span>
+        </div>
+      </button>
+      <button class="starter-btn" onclick="startSim('reflect')">
+        <span class="starter-icon">📝</span>
+        <div class="starter-text">
+          <strong>Reflect on a Past Session</strong>
+          <span>"Help me think through what went well and what to try differently."</span>
+        </div>
+      </button>
+      <button class="starter-btn" onclick="showOnboarding()">
+        <span class="starter-icon">🌱</span>
+        <div class="starter-text">
+          <strong>I'm New to EMT</strong>
+          <span>"Walk me through a beginner-friendly session and explain the choices."</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: ONBOARDING ══ -->
+<div class="screen" id="screen-onboarding">
+  <div class="onboard-inner">
+    <div class="onboard-header">
+      <button class="back-btn" onclick="showScreen('screen-landing')">← Back</button>
+      <h2>Before you meet Mia</h2>
+    </div>
+
+    <div class="onboard-section">
+      <h3>What is EMT?</h3>
+      <p>Enhanced Milieu Teaching (EMT) is a naturalistic teaching approach for promoting language and communication in everyday contexts. It's designed for children in the early stages of language learning — using single words or short phrases. EMT blends three things: arranging the environment to support communication, responding naturally to the child, and using targeted prompts to teach specific language.</p>
+    </div>
+
+    <div class="onboard-section">
+      <h3>Who is Mia?</h3>
+      <p>Mia is a 4-year-old with a language delay. She uses 1–2 word approximations ("bock" for block, "mow" for more), communicates a lot through reaching and pointing, and loves blocks, trains, and toy animals. She gets frustrated when she can't communicate her needs. Your job is to follow her lead, respond to her communication, and use EMT strategies to support her language.</p>
+    </div>
+
+    <div class="onboard-section">
+      <h3>The 6 EMT strategies</h3>
+      <div class="strategy-grid">
+        <div class="strategy-card">
+          <div class="s-name">1. Environmental Arrangement</div>
+          <div class="s-desc">Place preferred toys slightly out of reach. Offer choices. Create natural reasons for the child to communicate.</div>
+        </div>
+        <div class="strategy-card">
+          <div class="s-name">2. Responsive Interaction</div>
+          <div class="s-desc">Respond to ALL communication — gestures, sounds, words. Follow Mia's lead. Pause 3+ seconds before your next turn.</div>
+        </div>
+        <div class="strategy-card">
+          <div class="s-name">3. Target-Level Language</div>
+          <div class="s-desc">Model language at Mia's level or just above. Use short, grammatically complete sentences: "The block is big."</div>
+        </div>
+        <div class="strategy-card">
+          <div class="s-name">4. Toy Talk</div>
+          <div class="s-desc">Talk about the toy using its name. Describe its action, location, or quality: "The train is going fast."</div>
+        </div>
+        <div class="strategy-card">
+          <div class="s-name">5. Expansions</div>
+          <div class="s-desc">When Mia says a word, repeat it in a complete sentence: she says "bock" → you say "The block is heavy."</div>
+        </div>
+        <div class="strategy-card">
+          <div class="s-name">6. Milieu Prompts</div>
+          <div class="s-desc">Use sparingly (6–10 per session): Model ("say 'block'"), Mand-model ("what do you want?"), Time delay (expectant wait), Incidental teaching (prompt when child requests).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboard-section">
+      <h3>How this works</h3>
+      <ul>
+        <li>You'll see what Mia is doing and what she says</li>
+        <li>After each turn, choose from 4 labeled options — each reflects a different strategy</li>
+        <li>Mia responds realistically based on your choice</li>
+        <li>At the end of 3 scenes, you'll get a personalized assessment</li>
+        <li>You can exit any time using the Exit button</li>
+      </ul>
+    </div>
+
+    <button class="begin-btn" onclick="startSim('begin_guided')">I'm ready — start a guided session with Mia</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN: SIMULATION ══ -->
+<div class="screen" id="screen-sim">
+  <div class="sim-topbar">
+    <div class="sim-child-info">
+      <div class="child-avatar">🧒</div>
+      <div>
+        <div class="child-name">Mia, age 4</div>
+        <div class="child-desc">Language delay · 1–2 word utterances</div>
+      </div>
+    </div>
+    <div class="scene-indicator" id="scene-label">Scene 1 of 3</div>
+    <button class="exit-btn" onclick="openExitModal()">Exit session</button>
+  </div>
+
+  <div class="scene-progress">
+    <div class="scene-dot active" id="dot-1"></div>
+    <div class="scene-dot" id="dot-2"></div>
+    <div class="scene-dot" id="dot-3"></div>
+  </div>
+
+  <div class="chat-area" id="chat"></div>
+
+  <div class="action-area" id="action-area">
+    <div class="action-prompt">What do you do?</div>
+    <div class="action-grid" id="action-grid"></div>
+    <div class="end-session-wrap">
+      <button class="end-session-btn" onclick="openExitModal()">↩ Exit simulation</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: ASSESSMENT ══ -->
+<div class="screen" id="screen-assessment">
+  <div class="assess-inner">
+    <div class="assess-header">
+      <div class="badge">Session complete</div>
+      <h2>Your EMT Assessment</h2>
+      <p>Based on your choices with Mia today</p>
+    </div>
+    <div class="assess-content" id="assess-content">Generating your assessment…</div>
+    <div class="assess-actions">
+      <button class="assess-btn secondary" onclick="showScreen('screen-landing')">← Back to home</button>
+      <button class="assess-btn primary" onclick="startSim('begin')">Try another session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are "Mia," a 4-year-old child with a language delay practicing Enhanced Milieu Teaching (EMT) with a student teacher in SPED 7800.
+
+Your communication profile:
+- You use 1–2 word utterances (e.g., "bock," "mow," "up pees," "no no," "dat," "mow pees")
+- Strong non-verbal: reaching, pointing, leading by hand, eye gaze
+- High interest: blocks, trains, toy animals
+- Mild self-regulation challenges — frustration builds when communication breaks down
+- You are verbally imitative — sometimes repeat part of what the adult says
+
+CRITICAL RESPONSE FORMAT — always produce exactly three parts in this order:
+
+[ENVIRONMENT]: A bracketed stage direction (1–2 sentences) describing what Mia is doing, feeling, or what is happening. Use natural child behaviors. Occasionally include hiccups (*hic*), tantrums (described in environment, child goes silent or says "no! NO!"), sudden attention redirects, physical cues.
+
+MIA: Mia's actual words. 1–3 words max, or approximations, or "…" for silence. Keep it authentic.
+
+[CHOICES]:
+What do you do?
+A) [Strategy name] Description of action
+B) [Strategy name] Description of action
+C) [Strategy name] Description of action
+D) [Missed opportunity] Description of action
+
+Always include at least one strong evidence-based option and one missed opportunity. Label missed opportunity options with [Missed opportunity].
+
+REACTING TO TEACHER CHOICES:
+- Time delay used correctly → Mia makes a brief communicative attempt after a pause
+- Mand-model used correctly → Mia attempts the target word or approximation
+- Model used correctly → Mia imitates partially or fully
+- Expansions used correctly → Mia engages further, may attempt longer utterance next turn
+- Too many prompts back to back → Mia becomes passive, stops initiating
+- Missed opportunity → Mia disengages, self-stimulates, or withdraws
+- Directive question → Mia complies but reduces spontaneous communication
+- Correct co-regulation → Mia de-escalates within 1–2 turns
+
+Session has 3 scenes:
+Scene 1 — Free play / joint attention (3 turns)
+Scene 2 — Teachable moment: Mia needs something she can't reach (3 turns)
+Scene 3 — Mild behavioral/regulatory challenge (2 turns), then generate assessment
+
+After Scene 3, respond with:
+[ASSESSMENT]
+Then generate a full EMT session assessment including:
+- Strengths observed (2–3 specific evidence-based observations)
+- Growth areas (2–3 actionable recommendations naming specific EMT strategies)
+- Strategy usage table (Following child's lead, Target-level language, Expansions, Time delay, Mand-model, Model, Missed opportunities — each rated Strong/Developing/Missed)
+- Overall responsiveness score X/10
+- One encouraging closing sentence
+
+EMT KNOWLEDGE BASE (use silently to evaluate choices):
+Six strategies: Environmental arrangement, Responsive interaction, Target-level language in matched turns (strongest predictor of outcomes), Toy Talk (grammatically complete sentences with toy as subject), Expansions (repeat + add word in complete sentence, aim for 40% of child utterances), Milieu teaching prompts (use sparingly: 6–10 per session — Model, Mand-model, Time delay, Incidental teaching).
+
+Missed opportunity indicators: not responding to child communication, directive statements, back-to-back turns with <3s wait, language above/below target level, failing to expand clear utterances, giving material without acknowledging communicative attempt.
+
+Never break character during the session. Keep Mia's world focused on the toys in front of her.`;
+
+let conversationHistory = [];
+let sceneCount = 0;
+let turnCount = 0;
+let sessionLog = [];
+let startMode = 'begin';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showOnboarding() {
+  showScreen('screen-onboarding');
+}
+
+async function startSim(mode) {
+  startMode = mode;
+  conversationHistory = [];
+  sceneCount = 1;
+  turnCount = 0;
+  sessionLog = [];
+  document.getElementById('chat').innerHTML = '';
+  document.getElementById('action-grid').innerHTML = '';
+  updateSceneUI();
+  showScreen('screen-sim');
+
+  let firstMessage = '';
+  if (mode === 'begin' || mode === 'begin_guided') {
+    firstMessage = 'Start the session. Begin Scene 1 — free play. Show Mia playing and give me my first set of choices.';
+  } else if (mode === 'strategy') {
+    firstMessage = 'Set up a scenario where time delay is most naturally applicable. Begin with Scene 1 and give me my first set of choices.';
+  } else if (mode === 'reflect') {
+    firstMessage = 'I want to reflect on EMT strategies as we go. Begin Scene 1 and after each of my choices, briefly note (in one sentence after Mia responds) what strategy I used and whether it was effective, before giving me the next choices.';
+  }
+
+  await callClaude(firstMessage, true);
+}
+
+function updateSceneUI() {
+  document.getElementById('scene-label').textContent = `Scene ${sceneCount} of 3`;
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById(`dot-${i}`);
+    dot.classList.remove('active','done');
+    if (i < sceneCount) dot.classList.add('done');
+    if (i === sceneCount) dot.classList.add('active');
+  }
+}
+
+async function callClaude(userMessage, isFirst = false) {
+  setLoading(true, isFirst ? 'Mia is getting ready…' : 'Mia is thinking…');
+  disableActions();
+
+  if (userMessage) {
+    conversationHistory.push({ role: 'user', content: userMessage });
+  }
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: conversationHistory
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.map(b => b.text || '').join('') || '';
+    conversationHistory.push({ role: 'assistant', content: text });
+
+    setLoading(false);
+
+    if (text.includes('[ASSESSMENT]')) {
+      const assessText = text.split('[ASSESSMENT]')[1].trim();
+      renderAssessment(assessText);
+    } else {
+      renderMiaResponse(text);
+    }
+  } catch (err) {
+    setLoading(false);
+    appendSystemMsg('Something went wrong. Please try again.');
+    enableActions();
+  }
+}
+
+function renderMiaResponse(text) {
+  const chat = document.getElementById('chat');
+
+  // Parse environment
+  const envMatch = text.match(/\[ENVIRONMENT\][:：]?\s*([\s\S]*?)(?=MIA:|Mia:|\n\n)/i);
+  const miaMatch = text.match(/(?:MIA|Mia)[:：]\s*([\s\S]*?)(?=\[CHOICES\]|\n\nWhat do you do|\nWhat do you do)/i);
+  const choicesMatch = text.match(/(?:\[CHOICES\][\s\S]*?)?What do you do\??\s*([\s\S]+)/i);
+
+  if (envMatch) {
+    const env = document.createElement('div');
+    env.className = 'msg-wrap child';
+    env.innerHTML = `<div class="env-cue">🌿 ${envMatch[1].trim()}</div>`;
+    chat.appendChild(env);
+  }
+
+  if (miaMatch) {
+    const mia = document.createElement('div');
+    mia.className = 'msg-wrap child';
+    const words = miaMatch[1].trim();
+    mia.innerHTML = `<div class="msg-label">Mia</div><div class="bubble">${words}</div>`;
+    chat.appendChild(mia);
+  }
+
+  // Parse choices
+  if (choicesMatch) {
+    const choicesRaw = choicesMatch[1];
+    const lines = choicesRaw.split('\n').filter(l => l.trim());
+    const actions = [];
+
+    lines.forEach(line => {
+      const m = line.match(/^[A-D]\)\s*(\[.*?\])\s*(.*)/);
+      if (m) {
+        const tag = m[1].replace(/[\[\]]/g,'');
+        const desc = m[2].trim();
+        const isMissed = tag.toLowerCase().includes('missed');
+        actions.push({ tag, desc, isMissed, raw: line });
+      }
+    });
+
+    renderActions(actions);
+  }
+
+  // detect scene advancement from text
+  if (text.toLowerCase().includes('scene 2') || text.toLowerCase().includes('scene two')) {
+    sceneCount = 2; updateSceneUI();
+  } else if (text.toLowerCase().includes('scene 3') || text.toLowerCase().includes('scene three')) {
+    sceneCount = 3; updateSceneUI();
+  }
+
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function renderActions(actions) {
+  const grid = document.getElementById('action-grid');
+  grid.innerHTML = '';
+  actions.forEach((a, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'action-btn';
+    const tagClass = a.isMissed ? 'missed' : 'strong';
+    btn.innerHTML = `<span class="action-tag ${tagClass}">${a.tag}</span><span class="action-text">${a.desc}</span>`;
+    btn.onclick = () => handleChoice(a, btn);
+    grid.appendChild(btn);
+  });
+}
+
+async function handleChoice(action, btn) {
+  disableActions();
+  const chat = document.getElementById('chat');
+  sessionLog.push(action);
+
+  // show teacher bubble
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap teacher';
+  wrap.innerHTML = `<div class="msg-label">You</div><div class="bubble">${action.desc}</div>`;
+  chat.appendChild(wrap);
+
+  // typing
+  const typingWrap = document.createElement('div');
+  typingWrap.className = 'msg-wrap child';
+  typingWrap.innerHTML = `<div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  chat.appendChild(typingWrap);
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(async () => {
+    chat.removeChild(typingWrap);
+    turnCount++;
+
+    const userMsg = `I chose: ${action.tag} — ${action.desc}. Turn ${turnCount}. ${turnCount >= 8 ? 'This is the final turn. After Mia responds, generate the [ASSESSMENT].' : 'Continue the session.'}`;
+    await callClaude(userMsg);
+  }, 900);
+}
+
+function renderAssessment(text) {
+  showScreen('screen-assessment');
+  const el = document.getElementById('assess-content');
+
+  // simple markdown-like rendering
+  let html = text
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\|(.+)\|/g, (match) => {
+      const cells = match.split('|').filter(c => c.trim());
+      return '<div style="display:flex;gap:12px;padding:6px 0;border-bottom:1px solid var(--border);">' +
+        cells.map(c => `<span style="flex:1;font-size:13px">${c.trim()}</span>`).join('') + '</div>';
+    })
+    .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:18px;margin:8px 0">$1</ul>');
+
+  el.innerHTML = html;
+}
+
+function appendSystemMsg(msg) {
+  const chat = document.getElementById('chat');
+  const el = document.createElement('div');
+  el.style.cssText = 'text-align:center;font-size:13px;color:var(--soft);padding:12px';
+  el.textContent = msg;
+  chat.appendChild(el);
+}
+
+function disableActions() {
+  document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+}
+
+function enableActions() {
+  document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
+}
+
+function setLoading(show, msg = '') {
+  const el = document.getElementById('loading');
+  el.classList.toggle('active', show);
+  if (msg) document.getElementById('loading-text').textContent = msg;
+}
+
+function openExitModal() { document.getElementById('exit-modal').classList.add('active'); }
+function closeExitModal() { document.getElementById('exit-modal').classList.remove('active'); }
+function confirmExit() {
+  closeExitModal();
+  conversationHistory = [];
+  showScreen('screen-landing');
+}
+</script>
+</body>
+</html>
