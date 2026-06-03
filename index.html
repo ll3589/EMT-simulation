@@ -975,11 +975,14 @@ function renderMiaResponse(text) {
 function renderActions(actions) {
   const grid = document.getElementById('action-grid');
   grid.innerHTML = '';
+  const showTags = (startMode === 'begin_guided');
   actions.forEach((a, i) => {
     const btn = document.createElement('button');
     btn.className = 'action-btn';
     const tagClass = a.isMissed ? 'missed' : 'strong';
-    btn.innerHTML = `<span class="action-tag ${tagClass}">${a.tag}</span><span class="action-text">${a.desc}</span>`;
+    btn.innerHTML = showTags
+      ? `<span class="action-tag ${tagClass}">${a.tag}</span><span class="action-text">${a.desc}</span>`
+      : `<span class="action-text">${a.desc}</span>`;
     btn.onclick = () => handleChoice(a, btn);
     grid.appendChild(btn);
   });
